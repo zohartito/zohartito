@@ -1,0 +1,8 @@
+# Docs-only repo (profile README) — no package manifest to track.
+# Watch the GitHub Actions this repo runs.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
