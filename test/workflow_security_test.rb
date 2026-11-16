@@ -50,8 +50,30 @@ class WorkflowSecurityTest < Minitest::Test
                  'Keep the entire credentialed job disabled until its CLI bootstrap is hash-verified'
   end
 
+  def test_pro_09_all_remote_actions_are_pinned_to_full_commits
+    references = Dir.glob(File.join(WORKFLOWS, '*.{yml,yaml}')).flat_map do |path|
+      action_references(YAML.safe_load(File.read(path)))
+    end.reject { |reference| reference.start_with?('./') }
+    refute_empty references
+    unpinned = references.reject { |reference| reference.match?(/\A[^@\s]+@[0-9a-f]{40}\z/) }
+    assert_empty unpinned, 'Mutable Action tags must be replaced with reviewed full commit SHAs'
+  end
+
   def test_pro_n1_no_unconditional_cannot_push_claim
     refute_match(/contents:\s*read[^\n]*CANNOT push/i, @review_source,
                  'Workflow permissions alone do not bound an independently issued App token')
+  end
+
+  private
+
+  def action_references(node)
+    case node
+    when Hash
+      node.flat_map { |key, value| key == 'uses' ? [value] : action_references(value) }
+    when Array
+      node.flat_map { |value| action_references(value) }
+    else
+      []
+    end
   end
 end
