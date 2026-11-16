@@ -45,6 +45,11 @@ class WorkflowSecurityTest < Minitest::Test
     assert_equal 'default', args.fetch(mode_index + 1)
   end
 
+  def test_pro_02_reviewer_is_disabled_before_unverified_bootstrap
+    assert_equal '${{ false }}', @review['if'],
+                 'Keep the entire credentialed job disabled until its CLI bootstrap is hash-verified'
+  end
+
   def test_pro_n1_no_unconditional_cannot_push_claim
     refute_match(/contents:\s*read[^\n]*CANNOT push/i, @review_source,
                  'Workflow permissions alone do not bound an independently issued App token')

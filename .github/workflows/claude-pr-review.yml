@@ -2,10 +2,14 @@ name: PR Review
 on:
   pull_request:
     # Deliberately NOT triggering on `synchronize` to control metered cost —
-    # review runs once per PR open / ready / reopen, not on every push.
+    # when enabled, review runs once per PR open / ready / reopen, not on every push.
     types: [opened, ready_for_review, reopened]
 jobs:
   review:
+    # PRO-02: Disabled because the Action bootstraps via an unverified remote script.
+    # Before re-enabling, provide a fixed, hash-verified CLI through
+    # path_to_claude_code_executable and update the bootstrap regression test.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     permissions:
       contents: read          # scope the workflow token supplied below
